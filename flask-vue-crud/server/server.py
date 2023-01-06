@@ -18,7 +18,7 @@ CORS(app, resources={'/*': {'origins': '*'}})
 
 
 def get_db_connection():
-    conn = sqlite3.connect('/home/zach/flask-vue-crud/server/database.db')
+    conn = sqlite3.connect('/home/zach/Aircraft_Dashboard/flask-vue-crud/server/database.db')
     
     # conn.row_factory = sqlite3.Row
     return conn
