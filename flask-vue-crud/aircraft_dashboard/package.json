@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vueuse/sound": "^2.0.0",
     "vue": "^3.2.45",
     "vue3-apexcharts": "^1.4.1"
   },
