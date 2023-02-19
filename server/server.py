@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import sqlite3
+import serial
 
 
 # configuration
@@ -51,6 +52,9 @@ def get_data():
     'time_recorded' : data[15],
   })
 
+app.route('/serial_ports')
+def list_serial_ports():
+  return jsonify(['port1','port2','port3'])
 
 if __name__ == '__main__':
     app.run()
