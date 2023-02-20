@@ -16,5 +16,6 @@ CREATE TABLE serial_data(
     baro_altitude_ft DECIMAL NOT NULL,
     bat_voltage_V DECIMAL NOT NULL,
     local_time DECIMAL NOT NULL,
-    time_recorded DATETIME NOT NULL
+    time_recorded DATETIME NOT NULL,
+    sound_bit DECIMAL NOT NULL
 )
