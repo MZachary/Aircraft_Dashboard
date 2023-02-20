@@ -4,9 +4,7 @@
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
@@ -32,84 +30,54 @@
         </div>
       </div>
     </div>
-    
-    <script>
-      const ctx1 = document.getElementById('myChart1');
-      new Chart(ctx1, {
-        type: 'line',
-        data: {
-        labels:  [
-          'January',
-          'February',
-          'March',
-          'April',
-          'May',
-          'June',
-          'July'
-        ],
-        datasets: [{
-          label: 'My First Dataset',
-          data: [65, 59, 80, 81, 56, 55, 40],
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1
-        }]
-      },
-      });
 
-      const ctx2 = document.getElementById('myChart2');
-      new Chart(ctx2, {
-        type: 'line',
-        data: {
-        labels:  [
-          'January',
-          'February',
-          'March',
-          'April',
-          'May',
-          'June',
-          'July'
-        ],
-        datasets: [{
-          label: 'My First Dataset',
-          data: [65, 59, 80, 81, 56, 55, 40],
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1
-        }]
-      },
-      });
-
-      const ctx3 = document.getElementById('myChart3');
-      new Chart(ctx3, {
-        type: 'line',
-        data: {
-        labels:  [
-          'January',
-          'February',
-          'March',
-          'April',
-          'May',
-          'June',
-          'July'
-        ],
-        datasets: [{
-          label: 'My First Dataset',
-          data: [65, 59, 80, 81, 56, 55, 40],
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1
-        }]
-      },
-      });
-    </script>
     <script type="module">
       import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-
       const socket = io();
 
-      socket.on("data", (data) => console.log(data));
+      const newChart = (elementId) => {
+        const chart = new Chart(document.getElementById(elementId), {
+          type: 'line',
+          data: {
+            // labels: [],
+            datasets: [{
+              label: 'My First Dataset',
+              data: [65, 59, 80, 81, 56, 55, 40],
+              fill: false,
+              borderColor: 'rgb(75, 192, 192)',
+              tension: 0.1
+            }]
+          }
+        });
+        chart.options.animation = false;
+        return chart;
+      };
+
+      const addData = (chart, label, data) => {
+        chart.data.labels.push(label);
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.push(data);
+        });
+        chart.update();
+      };
+
+      const removeData = (chart) => {
+        if (chart.data.datasets.length >= 10) {
+          chart.data.labels.pop();
+          chart.data.datasets.forEach((dataset) => {
+              dataset.data.pop();
+          });
+          chart.update();
+        }
+      }
+
+      const chart1 = newChart('myChart1');
+
+      socket.on("data", (data) => {
+        addData(chart1, data.label, data.count);
+        removeData(chart1);
+        console.log(data);
+      });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
   </body>
 </html>

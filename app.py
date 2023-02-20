@@ -25,10 +25,12 @@ def dashboard():
 def background_thread():
     """Example of how to send server generated events to clients."""
     count = 0
+    labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     while True:
-        socketio.sleep(3)
+        socketio.sleep(1)
         count += 1
-        socketio.emit('data', {'count': count })
+
+        socketio.emit('data', {'count': count, 'label': labels[count % 12] })
 
 @socketio.event
 def connect():
