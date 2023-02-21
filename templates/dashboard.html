@@ -73,19 +73,35 @@
 
       const newChart = (elementId, label) => {
         return new Chart(document.getElementById(elementId), {
-          type: 'line',
-          data: { datasets: [{ label }] },
-          options: { animation: false }
+          type: 'scatter',
+          data: { 
+            datasets: [{ label,data: [{
+      x: -10,
+      y: 0
+    }, {
+      x: 0,
+      y: 10
+    }, {
+      x: 10,
+      y: 5
+    }, {
+      x: 0.5,
+      y: 5.5
+    }], }],
+            labels:[4,5,10],
+          },
+          options: { animation: false,
+           }
         });
       };
 
       const addData = (chart, label, data) => {
-        chart.data.labels.push(label);
+        // chart.data.labels.push(label);
         chart.data.datasets.forEach((dataset) => {
             dataset.data.push(data);
         });
 
-        if (chart.data.labels.length >= 11)  chart.data.labels.shift();
+        // if (chart.data.labels.length >= 11)  chart.data.labels.shift();
         if (chart.data.datasets[0].data.length >= 11) chart.data.datasets.forEach((dataset) => dataset.data.shift());
 
         chart.update();
