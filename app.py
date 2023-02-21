@@ -23,14 +23,17 @@ def dashboard():
     return render_template("dashboard.html", async_mode=socketio.async_mode)
 
 def background_thread():
-    """Example of how to send server generated events to clients."""
     count = 0
-    labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    while True:
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    db = conn.cursor()
+    db.execute('SELECT * FROM serial_data ORDER BY time_recorded DESC')
+    data = db.fetchall()
+    conn.close()
+    while count < len(data):
         socketio.sleep(1)
+        socketio.emit('data', dict(data[count]))
         count += 1
-
-        socketio.emit('data', {'count': count, 'label': labels[count % 12] })
 
 @socketio.event
 def connect():

@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -58,7 +57,7 @@
       const chart1 = newChart('myChart1', 'chart name');
 
       socket.on("data", (data) => {
-        addData(chart1, data.label, data.count);
+        /// we have useful data now
         console.log(data);
       });
     </script>
