@@ -17,51 +17,34 @@
       <div class="row">
         <div class="col">
           <div>
-            <canvas id="myChart1"></canvas>
+            <canvas id="latLong"></canvas>
           </div>
         </div>
         <div class="col">
           <div>
-            <canvas id="myChart2"></canvas>
+            <canvas id="headingBearing"></canvas>
           </div>
         </div>
         <div class="col">
           <div>
-            <canvas id="myChart3"></canvas>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <div>
-            <canvas id="myChart4"></canvas>
-          </div>
-        </div>
-        <div class="col">
-          <div>
-            <canvas id="myChart5"></canvas>
-          </div>
-        </div>
-        <div class="col">
-          <div>
-            <canvas id="myChart6"></canvas>
+            <canvas id="rangeFt"></canvas>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col">
           <div>
-            <canvas id="myChart7"></canvas>
+            <canvas id="airGroundSpeed"></canvas>
           </div>
         </div>
         <div class="col">
           <div>
-            <canvas id="myChart8"></canvas>
+            <canvas id="thetaPhi"></canvas>
           </div>
         </div>
         <div class="col">
           <div>
-            <canvas id="myChart9"></canvas>
+            <canvas id="gpsBaroAlt"></canvas>
           </div>
         </div>
       </div>
@@ -69,31 +52,19 @@
 
     <script type="module">
       import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-      const socket = io();
+      const socket = io.connect('http://127.0.0.1:5000');
 
-      const newChart = (elementId, label) => {
-        return new Chart(document.getElementById(elementId), {
-          type: 'scatter',
-          data: { 
-            datasets: [{ label,data: [{
-      x: -10,
-      y: 0
-    }, {
-      x: 0,
-      y: 10
-    }, {
-      x: 10,
-      y: 5
-    }, {
-      x: 0.5,
-      y: 5.5
-    }], }],
-            labels:[4,5,10],
-          },
-          options: { animation: false,
-           }
-        });
-      };
+      let charts = {
+        latLong: false,
+        headingBearing: false,
+        rangeFt: false,
+        airGroundSpeed: false,
+        thetaPhi: false,
+        gpsBaroAlt: false
+      }
+
+      const dataLength = 20;
+
 
       const addData = (chart, label, data) => {
         // chart.data.labels.push(label);
@@ -107,19 +78,85 @@
         chart.update();
       };
 
-      const chart1 = newChart('myChart1', 'test');
-      const chart2 = newChart('myChart2', 'chart name');
-      const chart3 = newChart('myChart3', 'chart name');
-      const chart4 = newChart('myChart4', 'chart name');
-      const chart5 = newChart('myChart5', 'chart name');
-      const chart6 = newChart('myChart6', 'chart name');
-      const chart7 = newChart('myChart7', 'chart name');
-      const chart8 = newChart('myChart8', 'chart name');
-      const chart9 = newChart('myChart9', 'chart name');
+      
+      const latLong = () => {      
+        
+      }
+
+      
+
+      const headingBearing = (local_time, heading_deg, bearing_deg) => {
+        if(!charts.headingBearing) {
+          //console.log('charts.headingBearing created', headingBearing)
+          charts.headingBearing = new Chart(document.getElementById('headingBearing'), {
+            type: 'line',
+            data: {
+              datasets: [
+                { label: 'Heading', data: [0] },
+                { label: 'Bearing', data: [10] }
+              ],
+              labels: ['123']
+            },
+            options: { animation: false }
+          });
+          //console.log('charts.headingBearing after', charts.headingBearing)
+        } else {
+          //console.log('charts.headingBearing', charts.headingBearing);
+          charts.headingBearing.data.labels.push(local_time);
+          if (charts.headingBearing.data.labels.length > dataLength)  charts.headingBearing.data.labels.shift();
+
+          //console.log('charts.data.datasets',  charts.headingBearing.data.datasets[0].data)
+          charts.headingBearing.data.datasets[0].data.push(heading_deg)
+          if (charts.headingBearing.data.datasets[0].data.length > dataLength) charts.headingBearing.data.datasets[0].data.shift();
+
+          //console.log('charts.data.datasets', charts.headingBearing.data.datasets[1].data)
+          charts.headingBearing.data.datasets[1].data.push(bearing_deg)
+          if (charts.headingBearing.data.datasets[1].data.length > dataLength) charts.headingBearing.data.datasets[1].data.shift();
+        }
+        // update data
+        charts.headingBearing.update();
+      }
+
+      const rangeFt = () => {
+        const chart1 = newChart('rangeFt');
+      }
+
+      const airGroundSpeed = () => {
+        const chart1 = newChart('airGroundSpeed');
+      }
+
+      const thetaPhi = () => {
+        const chart1 = newChart('thetaPhi');
+      }
+
+      const gpsBaroAlt = () => {
+        const chart1 = newChart('gpsBaroAlt');
+      }
 
       socket.on("data", (data) => {
         /// we have useful data now
+        const { local_time, heading_deg, bearing_deg } = data;
         console.log(data);
+
+        headingBearing(local_time, heading_deg, bearing_deg);
+        
+    //     'lat' : data[0],
+    // 'lon' : data[1],
+    // 'heading_deg' : data[2],
+    // 'bearing_deg' : data[3],
+    // 'range_ft' : data[4],
+    // 'target_lat' : data[5],
+    // 'target_lon' : data[6],
+    // 'airspeed_fps' : data[7],
+    // 'groundspeed_fps' : data[8],
+    // 'theta_deg' : data[9],
+    // 'phi_deg' : data[10],
+    // 'gps_altitude_ft' : data[11],
+    // 'baro_altitude_ft' : data[12],
+    // 'bat_voltage_V' : data[13],
+    // 'local_time' : data[14],
+    // 'time_recorded' : data[15],
+    // 'sound_bit' : data[16],
       });
     </script>
   </body>

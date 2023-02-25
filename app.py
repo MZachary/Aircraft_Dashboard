@@ -32,8 +32,13 @@ def background_thread():
     conn.close()
     while count < len(data):
         socketio.sleep(1)
+        print('count', count, '/', len(data))
+        
         socketio.emit('data', dict(data[count]))
-        count += 1
+        if(count > len(data)):
+            count = 0
+        else:
+            count += 1
 
 @socketio.event
 def connect():
