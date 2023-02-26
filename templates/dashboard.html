@@ -10,14 +10,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   </head>
   <body>
-    <!-- <div class='header'>
-      <button type="button">Start</button>
-    </div> -->
-    <form>
-      <input>
-      <select></select>
-      <input type="submit">
-    </form>
     <div class="container text-center">
       <div class="row">
         <div class="col">
@@ -55,52 +47,13 @@
       </div>
     </div>
     <script>
-      var synth = window.speechSynthesis;
-
-        var inputForm = document.querySelector('form');
-        var inputTxt = document.querySelector('input');
-        var voiceSelect = document.querySelector('select');
-
-
-        function populateVoiceList() {
-          voices = synth.getVoices();
-
-          for (i = 0; i < voices.length; i++) {
-            var option = document.createElement('option');
-            option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
-
-            if (voices[i].default) {
-              option.textContent += ' -- DEFAULT';
-            }
-
-            option.setAttribute('data-lang', voices[i].lang);
-            option.setAttribute('data-name', voices[i].name);
-            voiceSelect.appendChild(option);
-          }
-        }
-
-        populateVoiceList();
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-          speechSynthesis.onvoiceschanged = populateVoiceList;
-        }
-
-        inputForm.onsubmit = function (event) {
-          event.preventDefault();
-
-          var utterThis = new SpeechSynthesisUtterance(inputTxt.value);
-          var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
-          for (i = 0; i < voices.length; i++) {
-            if (voices[i].name === selectedOption) {
-              utterThis.voice = voices[i];
-            }
-          }
-          synth.speak(utterThis);
-          inputTxt.blur();
-        }
+      
     </script>
     <script type="module">
       import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
       const socket = io.connect('http://127.0.0.1:5000');
+
+      const synth = window.speechSynthesis;
 
       const dataLength = 20;
 
@@ -175,6 +128,13 @@
         });
       } 
 
+      const playSound = (sound_bit) => {
+        const voices = synth.getVoices();
+        const utterThis = new SpeechSynthesisUtterance(sound_bit);
+        utterThis.voice = voices[6];
+        synth.speak(utterThis);
+      }
+      
       socket.on("data", (data) => {
         const { local_time, heading_deg, bearing_deg, range_ft, airspeed_fps, groundspeed_fps, theta_deg, phi_deg, gps_altitude_ft, baro_altitude_ft, sound_bit } = data;
 
@@ -185,6 +145,7 @@
         addChartInformation('gpsBaroAlt', local_time, gps_altitude_ft, baro_altitude_ft);
         
         updateCharts();
+        if (typeof sound_bit === 'string' && (sound_bit != '0' && sound_bit != '')) playSound(sound_bit);
 
 
     // 'lat' : data[0],

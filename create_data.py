@@ -9,9 +9,9 @@ pd.options.mode.chained_assignment = None
 
 hz = 5
 
-connection = sqlite3.connect('/home/zach/Aircraft_Dashboard/server/database.db')
+connection = sqlite3.connect('database.db')
 
-with open('/home/zach/Aircraft_Dashboard/server/schema.sql') as f:
+with open('schema.sql') as f:
     connection.executescript(f.read())
 
 cur = connection.cursor()
@@ -19,7 +19,7 @@ cur = connection.cursor()
 count = 0
 total_count = 0
 adjusted_time = 0
-sample_data = pd.read_csv('/home/zach/Aircraft_Dashboard/server/sampleTelemData2.csv')
+sample_data = pd.read_csv('sampleTelemData2.csv')
 
 local_time = 0
 

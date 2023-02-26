@@ -17,5 +17,5 @@ CREATE TABLE serial_data(
     bat_voltage_V DECIMAL NOT NULL,
     local_time DECIMAL NOT NULL,
     time_recorded DATETIME NOT NULL,
-    sound_bit DECIMAL NOT NULL
+    sound_bit VARCHAR(200) NOT NULL
 )
