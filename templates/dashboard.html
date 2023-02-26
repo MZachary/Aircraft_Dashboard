@@ -56,195 +56,90 @@
 
       let charts = {
         latLong: false,
-        headingBearing: false,
-        rangeFt: false,
-        airGroundSpeed: false,
-        thetaPhi: false,
-        gpsBaroAlt: false
+        headingBearing: new Chart(document.getElementById('headingBearing'), {
+          type: 'line',
+          data: {
+            datasets: [
+              { label: 'Heading' },
+              { label: 'Bearing' }
+            ]
+          },
+          options: { animation: false }
+        }),
+        rangeFt: new Chart(document.getElementById('rangeFt'), {
+          type: 'line',
+          data: {
+            datasets: [
+              { label: 'Range Feet' },
+            ]
+          },
+          options: { animation: false }
+        }),
+        airGroundSpeed: new Chart(document.getElementById('airGroundSpeed'), {
+          type: 'line',
+          data: {
+            datasets: [
+              { label: 'Air Speed' },
+              { label: 'Ground Speed' }
+            ]
+          },
+          options: { animation: false }
+        }),
+        thetaPhi: new Chart(document.getElementById('thetaPhi'), {
+          type: 'line',
+          data: {
+            datasets: [
+              { label: 'theta_deg' },
+              { label: 'phi_deg' }
+            ]
+          },
+          options: { animation: false }
+        }),
+        gpsBaroAlt: new Chart(document.getElementById('gpsBaroAlt'), {
+          type: 'line',
+          data: {
+            datasets: [
+              { label: 'gps_altitude_ft' },
+              { label: 'baro_altitude_ft' }
+            ]
+          },
+          options: { animation: false }
+        })
       }
+
+      const updateCharts = () => {
+        Object.values(charts).forEach(chart => {
+          if (!!chart) chart.update();
+        });
+      }
+
+      const addChartInformation = (chart, label, ...chartData) => {
+        if(!charts[chart]) return;
+
+        charts[chart].data.labels.push(label);
+        if (charts[chart].data.labels.length > dataLength) charts[chart].data.labels.shift();
+
+        chartData.map((value, index) => {
+          charts[chart].data.datasets[index].data.push(value);
+          if (charts[chart].data.datasets[index].data.length > dataLength) charts[chart].data.datasets[index].data.shift();
+        });
+      } 
 
       const dataLength = 20;
-
-
-      const addData = (chart, label, data) => {
-        // chart.data.labels.push(label);
-        chart.data.datasets.forEach((dataset) => {
-            dataset.data.push(data);
-        });
-
-        // if (chart.data.labels.length >= 11)  chart.data.labels.shift();
-        if (chart.data.datasets[0].data.length >= 11) chart.data.datasets.forEach((dataset) => dataset.data.shift());
-
-        chart.update();
-      };
-
-      
-      const latLong = () => {      
-        
-      }
-
-      const headingBearing = (local_time, heading_deg, bearing_deg) => {
-        if(!charts.headingBearing) {
-          //console.log('charts.headingBearing created', headingBearing)
-          charts.headingBearing = new Chart(document.getElementById('headingBearing'), {
-            type: 'line',
-            data: {
-              datasets: [
-                { label: 'Heading' },
-                { label: 'Bearing' }
-              ]
-            },
-            options: { animation: false }
-          });
-          //console.log('charts.headingBearing after', charts.headingBearing)
-        } else {
-          //console.log('charts.headingBearing', charts.headingBearing);
-          charts.headingBearing.data.labels.push(local_time);
-          if (charts.headingBearing.data.labels.length > dataLength)  charts.headingBearing.data.labels.shift();
-
-          //console.log('charts.data.datasets',  charts.headingBearing.data.datasets[0].data)
-          charts.headingBearing.data.datasets[0].data.push(heading_deg)
-          if (charts.headingBearing.data.datasets[0].data.length > dataLength) charts.headingBearing.data.datasets[0].data.shift();
-
-          //console.log('charts.data.datasets', charts.headingBearing.data.datasets[1].data)
-          charts.headingBearing.data.datasets[1].data.push(bearing_deg)
-          if (charts.headingBearing.data.datasets[1].data.length > dataLength) charts.headingBearing.data.datasets[1].data.shift();
-        }
-        // update data
-        charts.headingBearing.update();
-      }
-
-      const rangeFt = (local_time, range_ft) => {
-        if (!charts.rangeFt) {
-          //console.log('charts.rangeFt created', rangeFt)
-          charts.rangeFt = new Chart(document.getElementById('rangeFt'), {
-            type: 'line',
-            data: {
-              datasets: [
-                { label: 'Range Feet' },
-              ]
-            },
-            options: { animation: false }
-          });
-          //console.log('charts.rangeFt after', charts.rangeFt)
-        } else {
-          //console.log('charts.rangeFt', charts.rangeFt);
-          charts.rangeFt.data.labels.push(local_time);
-          if (charts.rangeFt.data.labels.length > dataLength) charts.rangeFt.data.labels.shift();
-
-          //console.log('charts.data.datasets',  charts.rangeFt.data.datasets[0].data)
-          charts.rangeFt.data.datasets[0].data.push(range_ft)
-          if (charts.rangeFt.data.datasets[0].data.length > dataLength) charts.rangeFt.data.datasets[0].data.shift();
-        }
-        // update data
-        charts.rangeFt.update();
-      }
-
-      const airGroundSpeed = (local_time, airspeed_fps, groundspeed_fps) => {
-        if (!charts.airGroundSpeed) {
-          //console.log('charts.airGroundSpeed created', airGroundSpeed)
-          charts.airGroundSpeed = new Chart(document.getElementById('airGroundSpeed'), {
-            type: 'line',
-            data: {
-              datasets: [
-                { label: 'Air Speed' },
-                { label: 'Ground Speed' }
-              ]
-            },
-            options: { animation: false }
-          });
-          //console.log('charts.airGroundSpeed after', charts.airGroundSpeed)
-        } else {
-          //console.log('charts.airGroundSpeed', charts.airGroundSpeed);
-          charts.airGroundSpeed.data.labels.push(local_time);
-          if (charts.airGroundSpeed.data.labels.length > dataLength) charts.airGroundSpeed.data.labels.shift();
-
-          //console.log('charts.data.datasets',  charts.airGroundSpeed.data.datasets[0].data)
-          charts.airGroundSpeed.data.datasets[0].data.push(airspeed_fps)
-          if (charts.airGroundSpeed.data.datasets[0].data.length > dataLength) charts.airGroundSpeed.data.datasets[0].data.shift();
-
-          //console.log('charts.data.datasets', charts.airGroundSpeed.data.datasets[1].data)
-          charts.airGroundSpeed.data.datasets[1].data.push(groundspeed_fps)
-          if (charts.airGroundSpeed.data.datasets[1].data.length > dataLength) charts.airGroundSpeed.data.datasets[1].data.shift();
-        }
-        // update data
-        charts.airGroundSpeed.update();
-      }
-
-      const thetaPhi = (local_time, theta_deg, phi_deg) => {
-        if (!charts.thetaPhi) {
-          //console.log('charts.thetaPhi created', thetaPhi)
-          charts.thetaPhi = new Chart(document.getElementById('thetaPhi'), {
-            type: 'line',
-            data: {
-              datasets: [
-                { label: 'theta_deg' },
-                { label: 'phi_deg' }
-              ]
-            },
-            options: { animation: false }
-          });
-          //console.log('charts.thetaPhi after', charts.thetaPhi)
-        } else {
-          //console.log('charts.thetaPhi', charts.thetaPhi);
-          charts.thetaPhi.data.labels.push(local_time);
-          if (charts.thetaPhi.data.labels.length > dataLength) charts.thetaPhi.data.labels.shift();
-
-          //console.log('charts.data.datasets',  charts.thetaPhi.data.datasets[0].data)
-          charts.thetaPhi.data.datasets[0].data.push(theta_deg)
-          if (charts.thetaPhi.data.datasets[0].data.length > dataLength) charts.thetaPhi.data.datasets[0].data.shift();
-
-          //console.log('charts.data.datasets', charts.thetaPhi.data.datasets[1].data)
-          charts.thetaPhi.data.datasets[1].data.push(phi_deg)
-          if (charts.thetaPhi.data.datasets[1].data.length > dataLength) charts.thetaPhi.data.datasets[1].data.shift();
-        }
-        // update data
-        charts.thetaPhi.update();
-      }
-
-      const gpsBaroAlt = (local_time, gps_altitude_ft, baro_altitude_ft) => {
-        if (!charts.gpsBaroAlt) {
-          //console.log('charts.gpsBaroAlt created', gpsBaroAlt)
-          charts.gpsBaroAlt = new Chart(document.getElementById('gpsBaroAlt'), {
-            type: 'line',
-            data: {
-              datasets: [
-                { label: 'gps_altitude_ft' },
-                { label: 'baro_altitude_ft' }
-              ]
-            },
-            options: { animation: false }
-          });
-          //console.log('charts.gpsBaroAlt after', charts.gpsBaroAlt)
-        } else {
-          //console.log('charts.gpsBaroAlt', charts.gpsBaroAlt);
-          charts.gpsBaroAlt.data.labels.push(local_time);
-          if (charts.gpsBaroAlt.data.labels.length > dataLength) charts.gpsBaroAlt.data.labels.shift();
-
-          //console.log('charts.data.datasets',  charts.gpsBaroAlt.data.datasets[0].data)
-          charts.gpsBaroAlt.data.datasets[0].data.push(gps_altitude_ft)
-          if (charts.gpsBaroAlt.data.datasets[0].data.length > dataLength) charts.gpsBaroAlt.data.datasets[0].data.shift();
-
-          //console.log('charts.data.datasets', charts.gpsBaroAlt.data.datasets[1].data)
-          charts.gpsBaroAlt.data.datasets[1].data.push(baro_altitude_ft)
-          if (charts.gpsBaroAlt.data.datasets[1].data.length > dataLength) charts.gpsBaroAlt.data.datasets[1].data.shift();
-        }
-        // update data
-        charts.gpsBaroAlt.update();
-      }
+  
 
       socket.on("data", (data) => {
-        /// we have useful data now
         const { local_time, heading_deg, bearing_deg, range_ft, airspeed_fps, groundspeed_fps, theta_deg, phi_deg, gps_altitude_ft, baro_altitude_ft } = data;
-        console.log(data);
 
-        headingBearing(local_time, heading_deg, bearing_deg);
-        rangeFt(local_time, range_ft);
-        airGroundSpeed(local_time, airspeed_fps, groundspeed_fps);
-        thetaPhi(local_time, theta_deg, phi_deg);
-        gpsBaroAlt(local_time, gps_altitude_ft, baro_altitude_ft);
+        addChartInformation('headingBearing', local_time, heading_deg, bearing_deg);
+        addChartInformation('rangeFt', local_time, range_ft);
+        addChartInformation('airGroundSpeed', local_time, airspeed_fps, groundspeed_fps);
+        addChartInformation('thetaPhi', local_time, theta_deg, phi_deg);
+        addChartInformation('gpsBaroAlt', local_time, gps_altitude_ft, baro_altitude_ft);
         
-    //     'lat' : data[0],
+        updateCharts();
+
+    // 'lat' : data[0],
     // 'lon' : data[1],
     // 'heading_deg' : data[2],
     // 'bearing_deg' : data[3],
