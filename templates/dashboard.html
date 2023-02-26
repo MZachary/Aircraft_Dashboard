@@ -58,7 +58,7 @@
       const synth = window.speechSynthesis;
 
       const dataChartLength = 20;
-      const dataPlotLength = 40;
+      const dataPlotLength = 50;
 
       let charts = {
         latLon: new Chart(document.getElementById('latLon'), {
@@ -168,6 +168,10 @@
           if (charts[chart].data.datasets[1].data.length > dataPlotLength) charts[chart].data.datasets[1].data.shift();
         }
       }
+      // TODO: turn this into usable plotting
+      const addChartCircle = (chart, ...plots) => {
+        Math.sin();
+      }
 
       const playSound = (sound_bit) => {
         const voices = synth.getVoices();
@@ -189,7 +193,7 @@
         addChartInformation('gpsBaroAlt', time, gps_altitude_ft, baro_altitude_ft);
         
         updateCharts();
-
+        // enable this when using
         // if (typeof sound_bit === 'string' && (sound_bit != '0' && sound_bit != '')) playSound(sound_bit);
 
 
