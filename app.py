@@ -35,7 +35,7 @@ def background_thread():
         print('count', count, '/', len(data))
         
         socketio.emit('data', dict(data[count]))
-        if(count > len(data)):
+        if(count == (len(data) - 1)):
             count = 0
         else:
             count += 1
