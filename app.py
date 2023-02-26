@@ -27,7 +27,7 @@ def background_thread():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     db = conn.cursor()
-    db.execute('SELECT * FROM serial_data ORDER BY time_recorded DESC')
+    db.execute('SELECT * FROM serial_data ORDER BY time_recorded ASC')
     data = db.fetchall()
     conn.close()
     while count < len(data):

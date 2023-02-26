@@ -14,7 +14,7 @@
       <div class="row">
         <div class="col">
           <div>
-            <canvas id="latLong"></canvas>
+            <canvas id="latLon"></canvas>
           </div>
         </div>
         <div class="col">
@@ -22,18 +22,20 @@
             <canvas id="headingBearing"></canvas>
           </div>
         </div>
+      </div>
+      <div class="row">
         <div class="col">
           <div>
             <canvas id="rangeFt"></canvas>
           </div>
         </div>
-      </div>
-      <div class="row">
         <div class="col">
           <div>
             <canvas id="airGroundSpeed"></canvas>
           </div>
         </div>
+      </div>
+      <div class="row">
         <div class="col">
           <div>
             <canvas id="thetaPhi"></canvas>
@@ -55,10 +57,28 @@
 
       const synth = window.speechSynthesis;
 
-      const dataLength = 20;
+      const dataChartLength = 20;
+      const dataPlotLength = 40;
 
       let charts = {
-        latLong: false,
+        latLon: new Chart(document.getElementById('latLon'), {
+          type: 'scatter',
+          data: {
+            datasets: [
+              { label: 'Current Lat Log' },
+              { label: 'Lat Log' }
+            ]
+          },
+          options: { 
+            animation: false,
+            showLine: true,
+            elements: {
+              line: {
+                tension: 1
+              }
+            }
+          }
+        }),
         headingBearing: new Chart(document.getElementById('headingBearing'), {
           type: 'line',
           data: {
@@ -120,13 +140,34 @@
         if(!charts[chart]) return;
 
         charts[chart].data.labels.push(label);
-        if (charts[chart].data.labels.length > dataLength) charts[chart].data.labels.shift();
+        if (charts[chart].data.labels.length > dataChartLength) charts[chart].data.labels.shift();
 
         chartData.map((value, index) => {
           charts[chart].data.datasets[index].data.push(value);
-          if (charts[chart].data.datasets[index].data.length > dataLength) charts[chart].data.datasets[index].data.shift();
+          if (charts[chart].data.datasets[index].data.length > dataChartLength) charts[chart].data.datasets[index].data.shift();
         });
       } 
+
+      const addChartPlot = (chart, plot) => {
+        if (!charts[chart]) return;
+
+        let oldPlot;
+
+        const maxZoom = 1.0002;
+        const minZoom = .9998;
+        charts[chart].options.scales.x.max = plot.x * maxZoom;
+        charts[chart].options.scales.x.min = plot.x * minZoom;
+        charts[chart].options.scales.y.max = plot.y * maxZoom;
+        charts[chart].options.scales.y.min = plot.y * minZoom;
+        charts[chart].data.datasets[0].data.push(plot);
+        if (charts[chart].data.datasets[0].data.length > 1) oldPlot = charts[chart].data.datasets[0].data.shift();
+
+        if (oldPlot) {
+          charts[chart].data.datasets[1].data.push(oldPlot);
+          charts[chart].data.datasets[1].data.push(plot);
+          if (charts[chart].data.datasets[1].data.length > dataPlotLength) charts[chart].data.datasets[1].data.shift();
+        }
+      }
 
       const playSound = (sound_bit) => {
         const voices = synth.getVoices();
@@ -136,16 +177,20 @@
       }
       
       socket.on("data", (data) => {
-        const { local_time, heading_deg, bearing_deg, range_ft, airspeed_fps, groundspeed_fps, theta_deg, phi_deg, gps_altitude_ft, baro_altitude_ft, sound_bit } = data;
+        const { local_time, lat, lon, heading_deg, bearing_deg, range_ft, airspeed_fps, groundspeed_fps, theta_deg, phi_deg, gps_altitude_ft, baro_altitude_ft, sound_bit } = data;
 
-        addChartInformation('headingBearing', local_time, heading_deg, bearing_deg);
-        addChartInformation('rangeFt', local_time, range_ft);
-        addChartInformation('airGroundSpeed', local_time, airspeed_fps, groundspeed_fps);
-        addChartInformation('thetaPhi', local_time, theta_deg, phi_deg);
-        addChartInformation('gpsBaroAlt', local_time, gps_altitude_ft, baro_altitude_ft);
+        const time = Math.round(local_time * 100) / 1000
+
+        addChartPlot('latLon', { y: lat, x: lon });
+        addChartInformation('headingBearing', time, heading_deg, bearing_deg);
+        addChartInformation('rangeFt', time, range_ft);
+        addChartInformation('airGroundSpeed', time, airspeed_fps, groundspeed_fps);
+        addChartInformation('thetaPhi', time, theta_deg, phi_deg);
+        addChartInformation('gpsBaroAlt', time, gps_altitude_ft, baro_altitude_ft);
         
         updateCharts();
-        if (typeof sound_bit === 'string' && (sound_bit != '0' && sound_bit != '')) playSound(sound_bit);
+
+        // if (typeof sound_bit === 'string' && (sound_bit != '0' && sound_bit != '')) playSound(sound_bit);
 
 
     // 'lat' : data[0],
